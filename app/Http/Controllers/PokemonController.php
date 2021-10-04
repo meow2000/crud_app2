@@ -33,7 +33,7 @@ class PokemonController extends Controller
         ]);
     }
 
-    public function store() {
+    public function create() {
         request()->validate([
             'name' => 'required',
             'weight' => 'required'
@@ -43,13 +43,15 @@ class PokemonController extends Controller
             'name' => request('name'),
             'weight' => request('weight'),
         ]);
-
         return redirect('/pokemons');
     }
 
-    public function destroy($id) {
-        $pokemons = Pokemon::find($id);
-        $pokemons->delete();
+    public function destroy(Request $request) {
+        $id = $request->input('delete_id');
+        $pokemon = Pokemon::find($id);
+        if($pokemon != null) {
+            $pokemon->delete();
+        }
         return redirect('/pokemons');
     }
 }

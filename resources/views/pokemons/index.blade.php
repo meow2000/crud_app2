@@ -39,6 +39,12 @@ $(document).ready(function(){
 </script>
 <script>
 	$(document).ready(function () {
+		$(document).on('click', '.delete', function () {
+			var id = $(this).val();
+			$('#deleteEmployeeModal').modal('show');
+			$('#delete_id').val(id);
+		});
+
 		$(document).on('click', '.edit', function () {
 			var id = $(this).val();
 			$('#editEmployeeModal').modal('show');
@@ -101,7 +107,7 @@ $(document).ready(function(){
 							<td>{{$pokemon->LID}}</td>
 							<td>
 								<button type='button' value='{{$pokemon->id}}' class="edit"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></button>
-								<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+								<button type='button' value='{{$pokemon->id}}' class="delete"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></button>
 							</td>
 						</tr>
 					@endforeach
@@ -200,10 +206,11 @@ $(document).ready(function(){
 <div id="deleteEmployeeModal" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form action='/pokemons/{{$pokemon->id}}'>
+			<form action='{{ url('delete') }}' method='POST'>
 				@method('DELETE')
 				@csrf
 				
+				<input type='text' id='delete_id' name='delete_id' value='delete_id'/> 
 				<div class="modal-header">						
 					<h4 class="modal-title">Delete Pokemon</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
