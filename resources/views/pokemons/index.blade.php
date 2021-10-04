@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 <link rel='stylesheet' href="{{ asset('style.css') }}">
@@ -36,6 +36,23 @@ $(document).ready(function(){
 		}
 	});
 });
+</script>
+<script>
+	$(document).ready(function () {
+		$(document).on('click', '.edit', function () {
+			var id = $(this).val();
+			$('#editEmployeeModal').modal('show');
+			$.ajax({
+				type: "GET",
+				url: "/edit/"+id,
+				success: function (response) {
+					$('#name').val(response.pokemon.name);
+					$('#weight').val(response.pokemon.weight);
+					$('#id').val(id);
+				}
+			});
+		});
+	});
 </script>
 </head>
 <body>
@@ -83,7 +100,7 @@ $(document).ready(function(){
 							<td>{{$pokemon->weight}}</td>
 							<td>{{$pokemon->LID}}</td>
 							<td>
-								<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+								<button type='button' value='{{$pokemon->id}}' class="edit"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></button>
 								<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
 							</td>
 						</tr>
@@ -94,9 +111,9 @@ $(document).ready(function(){
 				<div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
 				<ul class="pagination">
 					<li class="page-item disabled"><a href="#">Previous</a></li>
-					<li class="page-item"><a href="#" class="page-link">1</a></li>
+					<li class="page-item active"><a href="#" class="page-link">1</a></li>
 					<li class="page-item"><a href="#" class="page-link">2</a></li>
-					<li class="page-item active"><a href="#" class="page-link">3</a></li>
+					<li class="page-item"><a href="#" class="page-link">3</a></li>
 					<li class="page-item"><a href="#" class="page-link">4</a></li>
 					<li class="page-item"><a href="#" class="page-link">5</a></li>
 					<li class="page-item"><a href="#" class="page-link">Next</a></li>
@@ -105,7 +122,7 @@ $(document).ready(function(){
 		</div>
 	</div>        
 </div>
-<!-- Edit Modal HTML -->
+<!-- Add Modal HTML -->
 <div id="addEmployeeModal" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -145,10 +162,11 @@ $(document).ready(function(){
 <div id="editEmployeeModal" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method ="POST" action='/pokemons/{{$pokemon->id}}'>
+			<form method ="POST" action='{{url('update')}}'>
 				@method('PUT')
 				@csrf
 				
+				<input type='hidden' id='id' name='id'/>
 				<div class="modal-header">						
 					<h4 class="modal-title">Edit Pokemon</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

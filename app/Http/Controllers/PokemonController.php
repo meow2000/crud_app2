@@ -12,20 +12,28 @@ class PokemonController extends Controller
         return view('pokemons.index', ['pokemons'=>$pokemons]);
     }
 
-    public function update($id) {
-        $pokemons = Pokemon::find($id);
+    public function update(Request $request) {
+        $id = $request->input('id');
+        $pokemon = Pokemon::find($id);
         request()->validate([
             'name' => 'required',
             'weight' => 'required'
         ]);
-        $pokemons->update([
-            'name' => request('name'),
-            'weight' => request('weight'),
-        ]);
+        $pokemon->name = $request->input('name');
+        $pokemon->weight = $request->input('weight');
+        $pokemon->save();
         return redirect('/pokemons');
     }
 
-    public function create() {
+    public function edit($id) {
+        $pokemon = Pokemon::find($id);
+        return response()->json([
+            'status'=>200,
+            'pokemon' => $pokemon
+        ]);
+    }
+
+    public function store() {
         request()->validate([
             'name' => 'required',
             'weight' => 'required'
