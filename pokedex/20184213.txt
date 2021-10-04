@@ -1,0 +1,56 @@
+1.Tìm pokemon hệ lửa(Fire)
+-----
+select p.name             
+from pokemon p, pokemon_types pt, types t
+where p.PID = pt.PID and pt.type_id = t.type_id and t.name = 'Fire';
+-----
+2. In ra tất cả pokemon có thể học được nhiều move nhất
+-----
+select p.name
+from pokemon p, CanLearn cl
+where p.PID = cl.PID group by PID having count(move_id) >= all(select count(move_id) from CanLearn group by PID);
+-----
+3. tạo trigger tự động insert vào bảng pokemon mỗi khi có 1 pokemon mới được tìm thấy
+-----
+create trigger new_pok after insert on Found for each row
+insert into pokemon select f.PID, f.name, f.height_feet, f.height_inches, f.weight, f.dex_number, f.parent_id, f.LID
+from Found f where exists (select PID from Found where Found.PID not in (select PID from pokemon ) and Found.PID = f.PID);
+-----
+4. tìm pokemon vừa học được tackle vừa học được string-shot
+-----
+select p.*                                          
+from pokemon p, CanLearn cl, moves m
+where p.PID = cl.PID and cl.move_id = m.move_id and m.move_name = 'tackle'                                             
+and p.PID in ( select cl1.PID from CanLearn cl1, moves m1 where m1.move_name = 'string-shot' and cl1.move_id = m1.move_id);
+-----
+5. đưa ra địa điểm và số pokemon ứng với địa điểm đó
+-----
+select l.LID, l.name, count(p.PID) from locations l, pokemon p where l.LID = p.LID group by p.LID;
+-----
+6. lấy về tên và độ dài tên pokemon chữ cái đầu bắt đầu bằng 'A' hoặc 'P' hoặc 'M', sắp xếp theo thứ tự bảng chữ cái
+-----
+select name, length(name) from pokemon where (name like 'A%' or name like 'M%' or name like 'P%') order by name;
+-----
+7. đưa ra bản ghi của pokemon có thứ tự lẻ trong bảng pokemon
+-----
+SET @i = 0; 
+SELECT i, PID
+FROM (SELECT @i := @i + 1 AS i, PID FROM pokemon)
+a WHERE MOD(a.i, 2) != 0;
+-----
+8. Tìm user chỉ có pokemon tìm thấy ở Celadon City chứ không có pokemon ở thành phố khác
+-----
+select u.username
+from users u, pokemon_users pu, pokemon p, locations l
+where u.id = pu.user_id and pu.PID = p.PID and l.LID = p.LID
+and l.name = 'Celadon City' and not exists (select p1.PID from pokemon p1, locations l1 where l1.LID = p1.LID and p1.PID = p.PID and l1.name != 'Celadon City')
+-----
+9. đưa ngày đầu tiên của tháng 3 tháng sau tháng hiện tại
+-----
+SELECT (ADDDATE(last_day(ADDDATE(CURDATE(),INTERVAL 2 MONTH)),INTERVAL 1 day));
+----- 
+10. chọn pokemon gây gấp đôi dame lên pokemon hệ Dragon
+-----
+select p.*  from pokemon p, pokemon_types pt, type_efficacy te, types t 
+where p.PID = pt.PID and te.damage_type_id = pt.type_id and t.type_id = te.target_type_id and t.name = 'Dragon' and te.damage_factor = 2;
+-----
